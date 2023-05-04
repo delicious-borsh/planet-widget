@@ -4,6 +4,12 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.widget.RemoteViews
+import com.ponykamni.astronomy.api.domain.Planet
+import com.ponykamni.astronomy.di.AstronomyFeatureImpl
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class UsefulWidget : AppWidgetProvider() {
@@ -29,10 +35,20 @@ internal fun updateAppWidget(
     appWidgetManager: AppWidgetManager,
     appWidgetId: Int
 ) {
-    val widgetText = context.getString(R.string.appwidget_text)
+    val getDistanceFromEarthUseCase = AstronomyFeatureImpl().getGetDistanceFromEarthUseCase()
 
     val views = RemoteViews(context.packageName, R.layout.useful_widget)
-    views.setTextViewText(R.id.appwidget_text, widgetText)
 
-    appWidgetManager.updateAppWidget(appWidgetId, views)
+    CoroutineScope(Dispatchers.IO).launch {
+        val marsDistance = getDistanceFromEarthUseCase(Planet.MARS)
+        val venusDistance = getDistanceFromEarthUseCase(Planet.VENUS)
+        val mercuryDistance = getDistanceFromEarthUseCase(Planet.MERCURY)
+
+        withContext(Dispatchers.Main) {
+            views.setTextViewText(R.id.mars_distance, marsDistance.toString())
+            views.setTextViewText(R.id.venus_distance, venusDistance.toString())
+            views.setTextViewText(R.id.mercury_distance, mercuryDistance.toString())
+            appWidgetManager.updateAppWidget(appWidgetId, views)
+        }
+    }
 }
