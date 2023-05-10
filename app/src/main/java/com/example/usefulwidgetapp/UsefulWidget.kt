@@ -74,7 +74,7 @@ class UsefulWidget : AppWidgetProvider() {
         pendingIntent: PendingIntent,
     ): RemoteViews {
         val views = RemoteViews(context.packageName, R.layout.planets_widget_small)
-        views.setTextViewText(R.id.planet_distance, distance)
+        views.setTextViewText(R.id.planet_name, distance)
         views.setOnClickPendingIntent(R.id.arrow_next, pendingIntent)
         views.setImageViewResource(R.id.planet_icon, planet.getIcon())
 
