@@ -5,6 +5,7 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.widget.RemoteViews
 import com.ponykamni.astronomy.api.domain.Planet
 
@@ -19,8 +20,7 @@ class UsefulWidget : AppWidgetProvider() {
             if (appWidgetId == -1) return
 
             incrementCurrentPlanet(appWidgetId, context)
-
-            context.sendBroadcast(createUpdateIntent(context, appWidgetId))
+            updateWidget(context, appWidgetId)
         }
     }
 
@@ -29,14 +29,6 @@ class UsefulWidget : AppWidgetProvider() {
         val newPlanet = Planet.values()[(oldPlanet.ordinal + 1) % Planet.values().size]
 
         updateCurrentPlanet(widgetId, newPlanet, context)
-    }
-
-    private fun createUpdateIntent(context: Context, widgetId: Int): Intent {
-        val intent = Intent(context, UsefulWidget::class.java)
-        intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, intArrayOf(widgetId))
-
-        return intent
     }
 
     override fun onUpdate(
@@ -49,36 +41,72 @@ class UsefulWidget : AppWidgetProvider() {
         }
     }
 
+    override fun onAppWidgetOptionsChanged(
+        context: Context?,
+        appWidgetManager: AppWidgetManager?,
+        appWidgetId: Int,
+        newOptions: Bundle?
+    ) {
+        super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
+
+        val minHeight = newOptions?.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT) ?: return
+        val maxHeight = newOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT)
+
+        val heightInCells = CellsCalculator().getWidgetHeightInCells(minHeight, maxHeight) ?: 1
+
+        updateHeight(appWidgetId, heightInCells, context ?: return)
+
+        updateWidget(context, appWidgetId)
+    }
+
     private fun updateAppWidget(
         context: Context,
         appWidgetManager: AppWidgetManager,
         appWidgetId: Int
     ) {
-        val pendingIntent = createPendingClickIntent(context, appWidgetId)
-
-        val currentPlanet = getCurrentPlanet(appWidgetId, context)
+        val heightInCells = getHeight(appWidgetId, context)
 
         val views = createViews(
             context,
-            currentPlanet,
-            currentPlanet.name,
-            pendingIntent,
+            appWidgetId,
+            heightInCells,
         )
         appWidgetManager.updateAppWidget(appWidgetId, views)
     }
 
     private fun createViews(
         context: Context,
-        planet: Planet,
-        distance: String,
-        pendingIntent: PendingIntent,
+        widgetId: Int,
+        heightInCells: Int,
     ): RemoteViews {
-        val views = RemoteViews(context.packageName, R.layout.planets_widget_small)
-        views.setTextViewText(R.id.planet_name, distance)
-        views.setOnClickPendingIntent(R.id.arrow_next, pendingIntent)
-        views.setImageViewResource(R.id.planet_icon, planet.getIcon())
+        return when {
+            heightInCells > 2 -> configureLargeView(context)
+            else -> configureSmallView(context, widgetId)
+        }
+    }
 
-        return views
+    private fun configureLargeView(context: Context): RemoteViews {
+        return RemoteViews(context.packageName, R.layout.planets_widget_large)
+            .apply {
+                setTextViewText(R.id.mars_distance, Planet.MARS.name)
+                setTextViewText(R.id.venus_distance, Planet.VENUS.name)
+                setTextViewText(R.id.mercury_distance, Planet.MERCURY.name)
+            }
+    }
+
+    private fun configureSmallView(context: Context, widgetId: Int): RemoteViews {
+        val pendingIntent = createPendingClickIntent(context, widgetId)
+
+        val currentPlanet = getCurrentPlanet(widgetId, context)
+
+        val distance = currentPlanet.name
+
+        return RemoteViews(context.packageName, R.layout.planets_widget_small)
+            .apply {
+                setTextViewText(R.id.planet_name, distance)
+                setOnClickPendingIntent(R.id.arrow_next, pendingIntent)
+                setImageViewResource(R.id.planet_icon, currentPlanet.getIcon())
+            }
     }
 
     private fun createPendingClickIntent(context: Context, widgetId: Int): PendingIntent {
@@ -98,6 +126,31 @@ class UsefulWidget : AppWidgetProvider() {
 
     private fun updateCurrentPlanet(widgetId: Int, planet: Planet, context: Context) {
         PlanetPreferences(context).updateCurrentPlanet(widgetId, planet)
+    }
+
+    private fun getHeight(widgetId: Int, context: Context): Int {
+        return WidgetSizePreferences(context).getHeight(widgetId)
+    }
+
+    private fun updateHeight(widgetId: Int, height: Int, context: Context) {
+        WidgetSizePreferences(context).updateHeight(widgetId, height)
+    }
+
+    companion object {
+
+        fun updateWidget(context: Context, id: Int) {
+            val intent = createUpdateIntent(context, id)
+
+            context.sendBroadcast(intent)
+        }
+
+        private fun createUpdateIntent(context: Context, widgetId: Int): Intent {
+            val intent = Intent(context, UsefulWidget::class.java)
+            intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, intArrayOf(widgetId))
+
+            return intent
+        }
     }
 }
 
