@@ -1,4 +1,4 @@
-package com.example.usefulwidgetapp
+package com.example.planetwidget.presentation
 
 class CellsCalculator {
 

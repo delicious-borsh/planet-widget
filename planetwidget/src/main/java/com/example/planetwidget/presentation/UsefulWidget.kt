@@ -1,4 +1,4 @@
-package com.example.usefulwidgetapp
+package com.example.planetwidget.presentation
 
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.RemoteViews
+import com.example.planetwidget.R
 import com.ponykamni.astronomy.api.domain.Planet
 
 

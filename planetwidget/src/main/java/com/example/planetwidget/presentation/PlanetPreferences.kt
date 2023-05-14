@@ -1,4 +1,4 @@
-package com.example.usefulwidgetapp
+package com.example.planetwidget.presentation
 
 import android.content.Context
 import com.ponykamni.astronomy.api.domain.Planet

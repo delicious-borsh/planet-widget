@@ -1,5 +1,4 @@
 <resources>
     <string name="app_name">Useful Widget App</string>
     <string name="empty_screen_message">This screen is very empty</string>
-    <string name="app_widget_description">Widget that shows distance from planets</string>
 </resources>

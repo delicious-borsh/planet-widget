@@ -1,6 +1,7 @@
-package com.example.usefulwidgetapp
+package com.example.planetwidget.presentation
 
 import androidx.annotation.DrawableRes
+import com.example.planetwidget.R
 import com.ponykamni.astronomy.api.domain.Planet
 
 @DrawableRes
