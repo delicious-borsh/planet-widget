@@ -3,7 +3,7 @@
 
     <application>
         <receiver
-            android:name="com.example.planetwidget.presentation.UsefulWidget"
+            android:name="com.example.planetwidget.presentation.PlanetWidget"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

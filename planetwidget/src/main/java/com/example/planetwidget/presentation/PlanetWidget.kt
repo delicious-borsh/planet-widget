@@ -11,7 +11,7 @@ import com.example.planetwidget.R
 import com.ponykamni.astronomy.api.domain.Planet
 
 
-class UsefulWidget : AppWidgetProvider() {
+class PlanetWidget : AppWidgetProvider() {
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
@@ -111,7 +111,7 @@ class UsefulWidget : AppWidgetProvider() {
     }
 
     private fun createPendingClickIntent(context: Context, widgetId: Int): PendingIntent {
-        val intent = Intent(context, UsefulWidget::class.java)
+        val intent = Intent(context, PlanetWidget::class.java)
         intent.action = ACTION_NEXT_PLANET
         intent.putExtra(EXTRA_WIDGET_ID, widgetId)
 
@@ -146,7 +146,7 @@ class UsefulWidget : AppWidgetProvider() {
         }
 
         private fun createUpdateIntent(context: Context, widgetId: Int): Intent {
-            val intent = Intent(context, UsefulWidget::class.java)
+            val intent = Intent(context, PlanetWidget::class.java)
             intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, intArrayOf(widgetId))
 
