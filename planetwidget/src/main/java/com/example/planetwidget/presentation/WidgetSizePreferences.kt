@@ -1,8 +1,9 @@
 package com.example.planetwidget.presentation
 
 import android.content.Context
+import javax.inject.Inject
 
-class WidgetSizePreferences(context: Context) {
+class WidgetSizePreferences @Inject constructor(context: Context) {
 
     private val preferences by lazy {
         context.getSharedPreferences(WIDGET_SIZE_PREFERENCES, Context.MODE_PRIVATE)

@@ -8,28 +8,32 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.RemoteViews
 import com.example.planetwidget.R
+import com.example.planetwidget.di.PlanetWidgetInjector
 import com.ponykamni.astronomy.api.domain.Planet
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
 class PlanetWidget : AppWidgetProvider() {
 
+    @Inject
+    lateinit var presenter: PlanetWidgetPresenter
+
     override fun onReceive(context: Context, intent: Intent) {
+        PlanetWidgetInjector.component?.inject(this)
+
         super.onReceive(context, intent)
+
         if (intent.action == ACTION_NEXT_PLANET) {
 
             val appWidgetId = intent.getIntExtra(EXTRA_WIDGET_ID, -1)
             if (appWidgetId == -1) return
 
-            incrementCurrentPlanet(appWidgetId, context)
+            presenter.incrementCurrentPlanet(appWidgetId)
             updateWidget(context, appWidgetId)
         }
-    }
-
-    private fun incrementCurrentPlanet(widgetId: Int, context: Context) {
-        val oldPlanet = getCurrentPlanet(widgetId, context)
-        val newPlanet = Planet.values()[(oldPlanet.ordinal + 1) % Planet.values().size]
-
-        updateCurrentPlanet(widgetId, newPlanet, context)
     }
 
     override fun onUpdate(
@@ -55,9 +59,9 @@ class PlanetWidget : AppWidgetProvider() {
 
         val heightInCells = CellsCalculator().getWidgetHeightInCells(minHeight, maxHeight) ?: 1
 
-        updateHeight(appWidgetId, heightInCells, context ?: return)
+        presenter.updateHeight(appWidgetId, heightInCells)
 
-        updateWidget(context, appWidgetId)
+        updateWidget(context ?: return, appWidgetId)
     }
 
     private fun updateAppWidget(
@@ -65,7 +69,7 @@ class PlanetWidget : AppWidgetProvider() {
         appWidgetManager: AppWidgetManager,
         appWidgetId: Int
     ) {
-        val heightInCells = getHeight(appWidgetId, context)
+        val heightInCells = presenter.getHeight(appWidgetId)
 
         val views = createViews(
             context,
@@ -98,7 +102,7 @@ class PlanetWidget : AppWidgetProvider() {
     private fun configureSmallView(context: Context, widgetId: Int): RemoteViews {
         val pendingIntent = createPendingClickIntent(context, widgetId)
 
-        val currentPlanet = getCurrentPlanet(widgetId, context)
+        val currentPlanet = presenter.getCurrentPlanet(widgetId)
 
         val distance = currentPlanet.name
 
@@ -121,20 +125,15 @@ class PlanetWidget : AppWidgetProvider() {
         )
     }
 
-    private fun getCurrentPlanet(widgetId: Int, context: Context): Planet {
-        return PlanetPreferences(context).getCurrentPlanet(widgetId)
-    }
-
-    private fun updateCurrentPlanet(widgetId: Int, planet: Planet, context: Context) {
-        PlanetPreferences(context).updateCurrentPlanet(widgetId, planet)
-    }
-
-    private fun getHeight(widgetId: Int, context: Context): Int {
-        return WidgetSizePreferences(context).getHeight(widgetId)
-    }
-
-    private fun updateHeight(widgetId: Int, height: Int, context: Context) {
-        WidgetSizePreferences(context).updateHeight(widgetId, height)
+    private fun doAsync(block: suspend () -> Unit) {
+        val pendingResult = goAsync()
+        CoroutineScope(SupervisorJob()).launch {
+            try {
+                block()
+            } finally {
+                pendingResult.finish()
+            }
+        }
     }
 
     companion object {

@@ -2,8 +2,9 @@ package com.example.planetwidget.presentation
 
 import android.content.Context
 import com.ponykamni.astronomy.api.domain.Planet
+import javax.inject.Inject
 
-class PlanetPreferences(context: Context) {
+class PlanetPreferences @Inject constructor(context: Context) {
 
     private val preferences by lazy {
         context.getSharedPreferences(PLANET_PREFERENCES, Context.MODE_PRIVATE)
