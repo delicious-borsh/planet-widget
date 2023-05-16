@@ -1,5 +1,7 @@
 package com.example.planetwidget.presentation
 
+import com.example.planetwidget.data.PlanetPreferences
+import com.example.planetwidget.data.WidgetSizePreferences
 import com.ponykamni.astronomy.api.domain.GetDistanceFromEarthUseCase
 import com.ponykamni.astronomy.api.domain.Planet
 import kotlinx.coroutines.Dispatchers
