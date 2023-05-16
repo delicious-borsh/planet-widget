@@ -8,6 +8,7 @@
         android:id="@+id/arrow_next"
         android:layout_width="20dp"
         android:layout_height="match_parent"
+        android:layout_marginStart="8dp"
         android:clickable="true"
         android:focusable="true"
         android:src="@drawable/ic_arrow_small" />
@@ -31,7 +32,8 @@
                 android:id="@+id/planet_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="8dp"
+                android:layout_marginVertical="8dp"
+                android:textColor="@android:color/white"
                 android:textSize="24sp"
                 android:textStyle="bold|italic" />
 
@@ -39,7 +41,7 @@
                 android:id="@+id/planet_distance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="8dp"
+                android:textColor="@android:color/white"
                 android:textSize="24sp" />
         </LinearLayout>
 

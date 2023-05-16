@@ -9,7 +9,9 @@ import android.os.Bundle
 import android.widget.RemoteViews
 import com.example.planetwidget.R
 import com.example.planetwidget.di.PlanetWidgetInjector
-import com.ponykamni.astronomy.api.domain.Planet
+import com.ponykamni.astronomy.api.domain.Planet.MARS
+import com.ponykamni.astronomy.api.domain.Planet.MERCURY
+import com.ponykamni.astronomy.api.domain.Planet.VENUS
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
@@ -20,6 +22,12 @@ class PlanetWidget : AppWidgetProvider() {
 
     @Inject
     lateinit var presenter: PlanetWidgetPresenter
+
+    override fun onEnabled(context: Context?) {
+        super.onEnabled(context)
+
+        doAsync { presenter.initDistances() }
+    }
 
     override fun onReceive(context: Context, intent: Intent) {
         PlanetWidgetInjector.component?.inject(this)
@@ -93,9 +101,9 @@ class PlanetWidget : AppWidgetProvider() {
     private fun configureLargeView(context: Context): RemoteViews {
         return RemoteViews(context.packageName, R.layout.planets_widget_large)
             .apply {
-                setTextViewText(R.id.mars_distance, Planet.MARS.name)
-                setTextViewText(R.id.venus_distance, Planet.VENUS.name)
-                setTextViewText(R.id.mercury_distance, Planet.MERCURY.name)
+                setTextViewText(R.id.mars_distance, presenter.getDistance(MARS).toString())
+                setTextViewText(R.id.venus_distance, presenter.getDistance(VENUS).toString())
+                setTextViewText(R.id.mercury_distance, presenter.getDistance(MERCURY).toString())
             }
     }
 
@@ -104,11 +112,12 @@ class PlanetWidget : AppWidgetProvider() {
 
         val currentPlanet = presenter.getCurrentPlanet(widgetId)
 
-        val distance = currentPlanet.name
+        val distance = presenter.getDistance(currentPlanet).toString()
 
         return RemoteViews(context.packageName, R.layout.planets_widget_small)
             .apply {
-                setTextViewText(R.id.planet_name, distance)
+                setTextViewText(R.id.planet_name, currentPlanet.name)
+                setTextViewText(R.id.planet_distance, distance)
                 setOnClickPendingIntent(R.id.arrow_next, pendingIntent)
                 setImageViewResource(R.id.planet_icon, currentPlanet.getIcon())
             }
