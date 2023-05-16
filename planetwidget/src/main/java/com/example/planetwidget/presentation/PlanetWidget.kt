@@ -101,9 +101,15 @@ class PlanetWidget : AppWidgetProvider() {
     private fun configureLargeView(context: Context): RemoteViews {
         return RemoteViews(context.packageName, R.layout.planets_widget_large)
             .apply {
-                setTextViewText(R.id.mars_distance, presenter.getDistance(MARS).toString())
-                setTextViewText(R.id.venus_distance, presenter.getDistance(VENUS).toString())
-                setTextViewText(R.id.mercury_distance, presenter.getDistance(MERCURY).toString())
+                setTextViewText(R.id.mars_distance, presenter.getDistance(MARS).toFormattedString())
+                setTextViewText(
+                    R.id.venus_distance,
+                    presenter.getDistance(VENUS).toFormattedString()
+                )
+                setTextViewText(
+                    R.id.mercury_distance,
+                    presenter.getDistance(MERCURY).toFormattedString()
+                )
             }
     }
 
@@ -112,7 +118,7 @@ class PlanetWidget : AppWidgetProvider() {
 
         val currentPlanet = presenter.getCurrentPlanet(widgetId)
 
-        val distance = presenter.getDistance(currentPlanet).toString()
+        val distance = presenter.getDistance(currentPlanet).toFormattedString()
 
         return RemoteViews(context.packageName, R.layout.planets_widget_small)
             .apply {
