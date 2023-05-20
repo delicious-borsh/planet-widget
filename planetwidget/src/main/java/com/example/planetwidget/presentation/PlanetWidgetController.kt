@@ -1,5 +1,6 @@
 package com.example.planetwidget.presentation
 
+import android.content.Context
 import com.example.planetwidget.data.PlanetDataPreferences
 import com.example.planetwidget.data.PlanetPreferences
 import com.example.planetwidget.data.WidgetSizePreferences
@@ -9,26 +10,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class PlanetWidgetPresenter @Inject constructor(
+class PlanetWidgetController @Inject constructor(
     private val getDistanceFromEarthUseCase: GetDistanceFromEarthUseCase,
     private val planetPreferences: PlanetPreferences,
     private val widgetSizePreferences: WidgetSizePreferences,
     private val planetDataPreferences: PlanetDataPreferences,
 ) {
 
-    suspend fun onWidgetHeightUpdate(widgetId: Int, newHeight: Int) {
-        withContext(Dispatchers.IO) {
-
-        }
+    fun onWidgetDataUpdated(context: Context) {
+        PlanetWidget.updateWidget(context)
     }
 
-    suspend fun onWidgetPlanetUpdate(widgetId: Int) {
-        withContext(Dispatchers.IO) {
-
-        }
-    }
-
-    suspend fun initDistances() {
+    suspend fun updatePlanetDistances() {
         withContext(Dispatchers.IO) {
             for (planet in Planet.values()) {
                 val distance = getDistanceFromEarthUseCase(planet)

@@ -21,12 +21,12 @@ import javax.inject.Inject
 class PlanetWidget : AppWidgetProvider() {
 
     @Inject
-    lateinit var presenter: PlanetWidgetPresenter
+    lateinit var controller: PlanetWidgetController
 
     override fun onEnabled(context: Context?) {
         super.onEnabled(context)
 
-        doAsync { presenter.initDistances() }
+        doAsync { controller.updatePlanetDistances() }
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -39,7 +39,7 @@ class PlanetWidget : AppWidgetProvider() {
             val appWidgetId = intent.getIntExtra(EXTRA_WIDGET_ID, -1)
             if (appWidgetId == -1) return
 
-            presenter.incrementCurrentPlanet(appWidgetId)
+            controller.incrementCurrentPlanet(appWidgetId)
             updateWidget(context, appWidgetId)
         }
     }
@@ -67,7 +67,7 @@ class PlanetWidget : AppWidgetProvider() {
 
         val heightInCells = CellsCalculator().getWidgetHeightInCells(minHeight, maxHeight) ?: 1
 
-        presenter.updateHeight(appWidgetId, heightInCells)
+        controller.updateHeight(appWidgetId, heightInCells)
 
         updateWidget(context ?: return, appWidgetId)
     }
@@ -77,7 +77,7 @@ class PlanetWidget : AppWidgetProvider() {
         appWidgetManager: AppWidgetManager,
         appWidgetId: Int
     ) {
-        val heightInCells = presenter.getHeight(appWidgetId)
+        val heightInCells = controller.getHeight(appWidgetId)
 
         val views = createViews(
             context,
@@ -101,14 +101,17 @@ class PlanetWidget : AppWidgetProvider() {
     private fun configureLargeView(context: Context): RemoteViews {
         return RemoteViews(context.packageName, R.layout.planets_widget_large)
             .apply {
-                setTextViewText(R.id.mars_distance, presenter.getDistance(MARS).toFormattedString())
+                setTextViewText(
+                    R.id.mars_distance,
+                    controller.getDistance(MARS).toFormattedString()
+                )
                 setTextViewText(
                     R.id.venus_distance,
-                    presenter.getDistance(VENUS).toFormattedString()
+                    controller.getDistance(VENUS).toFormattedString()
                 )
                 setTextViewText(
                     R.id.mercury_distance,
-                    presenter.getDistance(MERCURY).toFormattedString()
+                    controller.getDistance(MERCURY).toFormattedString()
                 )
             }
     }
@@ -116,9 +119,9 @@ class PlanetWidget : AppWidgetProvider() {
     private fun configureSmallView(context: Context, widgetId: Int): RemoteViews {
         val pendingIntent = createPendingClickIntent(context, widgetId)
 
-        val currentPlanet = presenter.getCurrentPlanet(widgetId)
+        val currentPlanet = controller.getCurrentPlanet(widgetId)
 
-        val distance = presenter.getDistance(currentPlanet).toFormattedString()
+        val distance = controller.getDistance(currentPlanet).toFormattedString()
 
         return RemoteViews(context.packageName, R.layout.planets_widget_small)
             .apply {
@@ -153,16 +156,19 @@ class PlanetWidget : AppWidgetProvider() {
 
     companion object {
 
-        fun updateWidget(context: Context, id: Int) {
+        fun updateWidget(context: Context, id: Int? = null) {
             val intent = createUpdateIntent(context, id)
 
             context.sendBroadcast(intent)
         }
 
-        private fun createUpdateIntent(context: Context, widgetId: Int): Intent {
+        private fun createUpdateIntent(context: Context, widgetId: Int?): Intent {
             val intent = Intent(context, PlanetWidget::class.java)
             intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, intArrayOf(widgetId))
+
+            widgetId?.let {
+                intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, intArrayOf(it))
+            }
 
             return intent
         }
