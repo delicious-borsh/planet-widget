@@ -6,6 +6,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.RemoteViews
 import com.example.planetwidget.R
 import com.example.planetwidget.di.PlanetWidgetInjector
@@ -40,7 +41,7 @@ class PlanetWidget : AppWidgetProvider() {
             if (appWidgetId == -1) return
 
             controller.incrementCurrentPlanet(appWidgetId)
-            updateWidget(context, appWidgetId)
+            updateWidget(context, intArrayOf(appWidgetId))
         }
     }
 
@@ -49,6 +50,7 @@ class PlanetWidget : AppWidgetProvider() {
         appWidgetManager: AppWidgetManager,
         appWidgetIds: IntArray
     ) {
+        Log.d("AAAAA", "received update intent with ids ${appWidgetIds.joinToString()}")
         for (appWidgetId in appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId)
         }
@@ -69,7 +71,7 @@ class PlanetWidget : AppWidgetProvider() {
 
         controller.updateHeight(appWidgetId, heightInCells)
 
-        updateWidget(context ?: return, appWidgetId)
+        updateWidget(context ?: return, intArrayOf(appWidgetId))
     }
 
     private fun updateAppWidget(
@@ -77,6 +79,8 @@ class PlanetWidget : AppWidgetProvider() {
         appWidgetManager: AppWidgetManager,
         appWidgetId: Int
     ) {
+        controller.onWidgetUpdatedOrCreated(appWidgetId)
+
         val heightInCells = controller.getHeight(appWidgetId)
 
         val views = createViews(
@@ -154,24 +158,32 @@ class PlanetWidget : AppWidgetProvider() {
         }
     }
 
+    override fun onDisabled(context: Context?) {
+        super.onDisabled(context)
+
+    }
+
+    override fun onDeleted(context: Context?, appWidgetIds: IntArray?) {
+        super.onDeleted(context, appWidgetIds)
+
+        for (id in appWidgetIds ?: return) {
+            controller.onWidgetRemoved(id)
+        }
+    }
+
     companion object {
 
-        fun updateWidget(context: Context, id: Int? = null) {
-            val intent = createUpdateIntent(context, id)
-
+        fun updateWidget(context: Context, appWidgetIds: IntArray) {
+            Log.d("AAAAA", "sending update intent")
+            val intent = createUpdateIntent(context, appWidgetIds)
             context.sendBroadcast(intent)
         }
 
-        private fun createUpdateIntent(context: Context, widgetId: Int?): Intent {
-            val intent = Intent(context, PlanetWidget::class.java)
-            intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-
-            widgetId?.let {
-                intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, intArrayOf(it))
+        private fun createUpdateIntent(context: Context, appWidgetIds: IntArray): Intent =
+            Intent(context, PlanetWidget::class.java).apply {
+                action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds)
             }
-
-            return intent
-        }
     }
 }
 

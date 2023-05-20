@@ -36,10 +36,12 @@ android {
 
 dependencies {
     ext.daggerVersion = '2.44'
+    ext.workVersion = "2.8.1"
 
     implementation project(path: ':astronomy')
     implementation project(path: ':planetwidget')
 
+    implementation "androidx.work:work-runtime-ktx:$workVersion"
     implementation "com.google.dagger:dagger:$daggerVersion"
     kapt "com.google.dagger:dagger-compiler:$daggerVersion"
 

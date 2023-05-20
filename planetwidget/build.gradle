@@ -27,9 +27,11 @@ android {
 
 dependencies {
     ext.daggerVersion = '2.44'
+    ext.workVersion = "2.8.1"
 
     implementation project(path: ':astronomy')
 
+    implementation "androidx.work:work-runtime-ktx:$workVersion"
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
 

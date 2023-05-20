@@ -1,9 +1,10 @@
 package com.example.planetwidget.presentation
 
 import android.content.Context
+import android.util.Log
 import com.example.planetwidget.data.PlanetDataPreferences
 import com.example.planetwidget.data.PlanetPreferences
-import com.example.planetwidget.data.WidgetSizePreferences
+import com.example.planetwidget.data.WidgetPreferences
 import com.ponykamni.astronomy.api.domain.GetDistanceFromEarthUseCase
 import com.ponykamni.astronomy.api.domain.Planet
 import kotlinx.coroutines.Dispatchers
@@ -13,19 +14,34 @@ import javax.inject.Inject
 class PlanetWidgetController @Inject constructor(
     private val getDistanceFromEarthUseCase: GetDistanceFromEarthUseCase,
     private val planetPreferences: PlanetPreferences,
-    private val widgetSizePreferences: WidgetSizePreferences,
+    private val widgetPreferences: WidgetPreferences,
     private val planetDataPreferences: PlanetDataPreferences,
 ) {
 
-    fun onWidgetDataUpdated(context: Context) {
-        PlanetWidget.updateWidget(context)
+    fun onDataUpdated(context: Context) {
+        val currentWidgets = widgetPreferences.getWidgetList().toIntArray()
+        PlanetWidget.updateWidget(context, currentWidgets)
+    }
+
+    fun onWidgetUpdatedOrCreated(widgetId: Int) {
+        widgetPreferences.addWidgetIfNotPresent(widgetId)
+    }
+
+    fun onWidgetRemoved(widgetId: Int) {
+        widgetPreferences.removeWidget(widgetId)
+        planetPreferences.deleteDataForWidget(widgetId)
     }
 
     suspend fun updatePlanetDistances() {
         withContext(Dispatchers.IO) {
+            Log.d("AAAAA", "updating planets")
             for (planet in Planet.values()) {
+                Log.d("AAAAA", "updating for $planet")
                 val distance = getDistanceFromEarthUseCase(planet)
+                Log.d("AAAAA", "distance is $distance")
                 updatePlanetDistance(planet, distance)
+                Log.d("AAAAA", "writing...")
+                Log.d("AAAAA", "new distance is ${getDistance(planet)}...")
             }
         }
     }
@@ -46,11 +62,11 @@ class PlanetWidgetController @Inject constructor(
     }
 
     fun getHeight(widgetId: Int): Int {
-        return widgetSizePreferences.getHeight(widgetId)
+        return widgetPreferences.getHeight(widgetId)
     }
 
     fun updateHeight(widgetId: Int, height: Int) {
-        widgetSizePreferences.updateHeight(widgetId, height)
+        widgetPreferences.updateHeight(widgetId, height)
     }
 
     fun getDistance(planet: Planet): Long {

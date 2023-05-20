@@ -30,6 +30,13 @@ class PlanetPreferences @Inject constructor(context: Context) {
         return Planet.valueOf(planetString)
     }
 
+    fun deleteDataForWidget(widgetId: Int) {
+        preferences
+            .edit()
+            .remove(getKey(widgetId))
+            .apply()
+    }
+
     private fun getKey(widgetId: Int): String = widgetId.toString() + POSTFIX_CURRENT_PLANET
 
     companion object {
