@@ -24,7 +24,7 @@ class PlanetDataPreferences @Inject constructor(context: Context) {
     private fun getKey(planet: Planet): String = planet.name + POSTFIX_DISTANCE
 
     companion object {
-        private const val PLANET_DATA_PREFERENCES = "PLANET_DATA_PREFERENCES"
+        private const val PLANET_DATA_PREFERENCES = "planet_data_preferences"
         private const val POSTFIX_DISTANCE = "_CURRENT_PLANET"
     }
 }

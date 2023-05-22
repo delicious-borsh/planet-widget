@@ -6,7 +6,7 @@ import javax.inject.Inject
 class WidgetPreferences @Inject constructor(context: Context) {
 
     private val preferences by lazy {
-        context.getSharedPreferences(WIDGET_SIZE_PREFERENCES, Context.MODE_PRIVATE)
+        context.getSharedPreferences(WIDGET_PREFERENCES, Context.MODE_PRIVATE)
     }
 
     fun addWidgetIfNotPresent(widgetId: Int) {
@@ -50,7 +50,7 @@ class WidgetPreferences @Inject constructor(context: Context) {
     private fun getKey(widgetId: Int): String = widgetId.toString() + POSTFIX_HEIGHT_IN_CELLS
 
     companion object {
-        private const val WIDGET_SIZE_PREFERENCES = "WIDGET_SIZE_PREFERENCES"
+        private const val WIDGET_PREFERENCES = "widget_preferences"
         private const val POSTFIX_HEIGHT_IN_CELLS = "_HEIGHT_IN_CELLS"
 
         private const val KEY_WIDGETS_ID_SET = "KEY_WIDGETS_ID_SET"

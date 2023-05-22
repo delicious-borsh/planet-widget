@@ -40,7 +40,7 @@ class PlanetPreferences @Inject constructor(context: Context) {
     private fun getKey(widgetId: Int): String = widgetId.toString() + POSTFIX_CURRENT_PLANET
 
     companion object {
-        private const val PLANET_PREFERENCES = "PLANET_PREFERENCES"
+        private const val PLANET_PREFERENCES = "planet_preferences"
         private const val POSTFIX_CURRENT_PLANET = "_CURRENT_PLANET"
     }
 }
