@@ -1,18 +1,12 @@
 package com.example.planetwidget.presentation
 
-import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.widget.RemoteViews
-import com.example.planetwidget.R
 import com.example.planetwidget.di.PlanetWidgetInjector
-import com.ponykamni.astronomy.api.domain.Planet.MARS
-import com.ponykamni.astronomy.api.domain.Planet.MERCURY
-import com.ponykamni.astronomy.api.domain.Planet.VENUS
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
@@ -23,6 +17,11 @@ class PlanetWidget : AppWidgetProvider() {
 
     @Inject
     lateinit var controller: PlanetWidgetController
+
+    private val remoteViewsFactory = RemoteViewsFactory(
+        controller::getDistance,
+        controller::getCurrentPlanet,
+    )
 
     override fun onEnabled(context: Context?) {
         super.onEnabled(context)
@@ -83,68 +82,12 @@ class PlanetWidget : AppWidgetProvider() {
 
         val heightInCells = controller.getHeight(appWidgetId)
 
-        val views = createViews(
+        val views = remoteViewsFactory.createViews(
             context,
             appWidgetId,
             heightInCells,
         )
         appWidgetManager.updateAppWidget(appWidgetId, views)
-    }
-
-    private fun createViews(
-        context: Context,
-        widgetId: Int,
-        heightInCells: Int,
-    ): RemoteViews {
-        return when {
-            heightInCells > 2 -> configureLargeView(context)
-            else -> configureSmallView(context, widgetId)
-        }
-    }
-
-    private fun configureLargeView(context: Context): RemoteViews {
-        return RemoteViews(context.packageName, R.layout.planets_widget_large)
-            .apply {
-                setTextViewText(
-                    R.id.mars_distance,
-                    controller.getDistance(MARS).toFormattedString()
-                )
-                setTextViewText(
-                    R.id.venus_distance,
-                    controller.getDistance(VENUS).toFormattedString()
-                )
-                setTextViewText(
-                    R.id.mercury_distance,
-                    controller.getDistance(MERCURY).toFormattedString()
-                )
-            }
-    }
-
-    private fun configureSmallView(context: Context, widgetId: Int): RemoteViews {
-        val pendingIntent = createPendingClickIntent(context, widgetId)
-
-        val currentPlanet = controller.getCurrentPlanet(widgetId)
-
-        val distance = controller.getDistance(currentPlanet).toFormattedString()
-
-        return RemoteViews(context.packageName, R.layout.planets_widget_small)
-            .apply {
-                setTextViewText(R.id.planet_name, currentPlanet.name)
-                setTextViewText(R.id.planet_distance, distance)
-                setOnClickPendingIntent(R.id.arrow_next, pendingIntent)
-                setImageViewResource(R.id.planet_icon, currentPlanet.getIcon())
-            }
-    }
-
-    private fun createPendingClickIntent(context: Context, widgetId: Int): PendingIntent {
-        val intent = Intent(context, PlanetWidget::class.java)
-        intent.action = ACTION_NEXT_PLANET
-        intent.putExtra(EXTRA_WIDGET_ID, widgetId)
-
-        return PendingIntent.getBroadcast(
-            context, widgetId, intent,
-            PendingIntent.FLAG_UPDATE_CURRENT + PendingIntent.FLAG_IMMUTABLE,
-        )
     }
 
     private fun doAsync(block: suspend () -> Unit) {
@@ -187,5 +130,5 @@ class PlanetWidget : AppWidgetProvider() {
     }
 }
 
-private const val ACTION_NEXT_PLANET = "ACTION_NEXT_PLANET"
-private const val EXTRA_WIDGET_ID = "EXTRA_WIDGET_ID"
+const val ACTION_NEXT_PLANET = "ACTION_NEXT_PLANET"
+const val EXTRA_WIDGET_ID = "EXTRA_WIDGET_ID"

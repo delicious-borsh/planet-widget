@@ -39,7 +39,7 @@ class PlanetWidgetController @Inject constructor(
                 Log.d("AAAAA", "updating for $planet")
                 val distance = getDistanceFromEarthUseCase(planet)
                 Log.d("AAAAA", "distance is $distance")
-                updatePlanetDistance(planet, distance)
+                planetDataPreferences.updateDistance(planet, distance)
                 Log.d("AAAAA", "writing...")
                 Log.d("AAAAA", "new distance is ${getDistance(planet)}...")
             }
@@ -50,30 +50,16 @@ class PlanetWidgetController @Inject constructor(
         val oldPlanet = getCurrentPlanet(widgetId)
         val newPlanet = Planet.values()[(oldPlanet.ordinal + 1) % Planet.values().size]
 
-        updateCurrentPlanet(widgetId, newPlanet)
+        planetPreferences.updateCurrentPlanet(widgetId, newPlanet)
     }
 
-    private fun updateCurrentPlanet(widgetId: Int, planet: Planet) {
-        planetPreferences.updateCurrentPlanet(widgetId, planet)
-    }
+    fun getCurrentPlanet(widgetId: Int): Planet = planetPreferences.getCurrentPlanet(widgetId)
 
-    fun getCurrentPlanet(widgetId: Int): Planet {
-        return planetPreferences.getCurrentPlanet(widgetId)
-    }
-
-    fun getHeight(widgetId: Int): Int {
-        return widgetPreferences.getHeight(widgetId)
-    }
+    fun getHeight(widgetId: Int): Int = widgetPreferences.getHeight(widgetId)
 
     fun updateHeight(widgetId: Int, height: Int) {
         widgetPreferences.updateHeight(widgetId, height)
     }
 
-    fun getDistance(planet: Planet): Long {
-        return planetDataPreferences.getDistance(planet)
-    }
-
-    fun updatePlanetDistance(planet: Planet, distance: Long) {
-        planetDataPreferences.updateDistance(planet, distance)
-    }
+    fun getDistance(planet: Planet): Long = planetDataPreferences.getDistance(planet)
 }
