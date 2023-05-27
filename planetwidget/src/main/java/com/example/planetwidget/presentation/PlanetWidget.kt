@@ -18,10 +18,12 @@ class PlanetWidget : AppWidgetProvider() {
     @Inject
     lateinit var controller: PlanetWidgetController
 
-    private val remoteViewsFactory = RemoteViewsFactory(
-        controller::getDistance,
-        controller::getCurrentPlanet,
-    )
+    private val remoteViewsFactory by lazy {
+        RemoteViewsFactory(
+            controller::getDistance,
+            controller::getCurrentPlanet,
+        )
+    }
 
     override fun onEnabled(context: Context?) {
         super.onEnabled(context)
