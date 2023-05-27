@@ -39,14 +39,9 @@ class PlanetWidgetController @Inject constructor(
 
     suspend fun updatePlanetDistances() {
         withContext(Dispatchers.IO) {
-            Log.d("AAAAA", "updating planets")
             for (planet in Planet.values()) {
-                Log.d("AAAAA", "updating for $planet")
                 val distance = getDistanceFromEarthUseCase(planet)
-                Log.d("AAAAA", "distance is $distance")
                 planetDataPreferences.updateDistance(planet, distance)
-                Log.d("AAAAA", "writing...")
-                Log.d("AAAAA", "new distance is ${getDistance(planet)}...")
             }
         }
     }

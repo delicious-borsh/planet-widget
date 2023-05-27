@@ -51,7 +51,6 @@ class PlanetWidget : AppWidgetProvider() {
         appWidgetManager: AppWidgetManager,
         appWidgetIds: IntArray
     ) {
-        Log.d("AAAAA", "received update intent with ids ${appWidgetIds.joinToString()}")
         for (appWidgetId in appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId)
         }
@@ -119,7 +118,6 @@ class PlanetWidget : AppWidgetProvider() {
     companion object {
 
         fun updateWidget(context: Context, appWidgetIds: IntArray) {
-            Log.d("AAAAA", "sending update intent")
             val intent = createUpdateIntent(context, appWidgetIds)
             context.sendBroadcast(intent)
         }

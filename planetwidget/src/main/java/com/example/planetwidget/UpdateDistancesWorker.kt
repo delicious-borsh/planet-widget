@@ -16,11 +16,8 @@ class UpdateDistancesWorker(
 ) : CoroutineWorker(appContext, workerParams) {
 
     override suspend fun doWork(): Result {
-        Log.d("AAAAA", "WORKKKKKKK")
         try {
-            Log.d("AAAAA", "updating distances")
             planetWidgetController.updatePlanetDistances()
-            Log.d("AAAAA", "updating widget")
             planetWidgetController.onDataUpdated(appContext)
         } catch (ex: Exception) {
             return Result.failure()
