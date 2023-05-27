@@ -23,6 +23,11 @@ class PlanetWidgetController @Inject constructor(
         PlanetWidget.updateWidget(context, currentWidgets)
     }
 
+    fun onDataUpdated(context: Context, widgetId: Int) {
+        val currentWidgets = widgetPreferences.getWidgetList().toIntArray()
+        PlanetWidget.updateWidget(context, intArrayOf(widgetId))
+    }
+
     fun onWidgetUpdatedOrCreated(widgetId: Int) {
         widgetPreferences.addWidgetIfNotPresent(widgetId)
     }
@@ -51,6 +56,10 @@ class PlanetWidgetController @Inject constructor(
         val newPlanet = Planet.values()[(oldPlanet.ordinal + 1) % Planet.values().size]
 
         planetPreferences.updateCurrentPlanet(widgetId, newPlanet)
+    }
+
+    fun updateCurrentPlanet(widgetId: Int, planet: Planet) {
+        planetPreferences.updateCurrentPlanet(widgetId, planet)
     }
 
     fun getCurrentPlanet(widgetId: Int): Planet = planetPreferences.getCurrentPlanet(widgetId)

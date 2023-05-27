@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:configure="com.example.planetwidget.presentation.PlanetWidgetConfigurationActivity"
     android:description="@string/app_widget_description"
     android:initialKeyguardLayout="@layout/planets_widget_small"
     android:initialLayout="@layout/planets_widget_small"
     android:minWidth="250dp"
     android:minHeight="40dp"
-    android:previewImage="@drawable/ic_mars"
+    android:previewImage="@drawable/ic_earth"
     android:resizeMode="vertical"
     android:updatePeriodMillis="0"
     android:widgetCategory="home_screen" />

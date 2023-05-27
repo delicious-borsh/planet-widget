@@ -2,6 +2,7 @@ package com.example.planetwidget.di;
 
 import android.content.Context
 import com.example.planetwidget.presentation.PlanetWidget
+import com.example.planetwidget.presentation.PlanetWidgetConfigurationActivity
 import com.ponykamni.astronomy.api.di.AstronomyFeature
 import dagger.BindsInstance
 import dagger.Component
@@ -32,6 +33,7 @@ class PlanetWidgetFeatureImpl internal constructor(
 internal interface PlanetWidgetFeatureComponent : PlanetWidgetFeature {
 
     fun inject(planetWidget: PlanetWidget)
+    fun inject(planetWidgetConfigurationActivity: PlanetWidgetConfigurationActivity)
 
     @Component.Factory
     interface Factory {

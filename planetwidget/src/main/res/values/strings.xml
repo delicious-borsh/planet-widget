@@ -1,3 +1,8 @@
 <resources>
     <string name="app_widget_description">Widget that shows distance from planets</string>
+    <string name="choose_planet">Choose starting planet</string>
+    <string name="mars">mars</string>
+    <string name="venus">venus</string>
+    <string name="mercury">mercury</string>
+    <string name="ok">OK</string>
 </resources>
