@@ -5,8 +5,10 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import com.example.planetwidget.UpdateDistancesWorker
 import com.example.planetwidget.di.PlanetWidgetInjector
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
@@ -17,6 +19,10 @@ class PlanetWidget : AppWidgetProvider() {
 
     @Inject
     lateinit var controller: PlanetWidgetController
+
+    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        Log.e("PlanetWidget", "Some error occured", throwable)
+    }
 
     private val remoteViewsFactory by lazy {
         RemoteViewsFactory(
@@ -95,7 +101,7 @@ class PlanetWidget : AppWidgetProvider() {
 
     private fun doAsync(block: suspend () -> Unit) {
         val pendingResult = goAsync()
-        CoroutineScope(SupervisorJob()).launch {
+        CoroutineScope(SupervisorJob() + exceptionHandler).launch {
             try {
                 block()
             } finally {
