@@ -5,7 +5,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import com.example.planetwidget.UpdateDistancesWorker
 import com.example.planetwidget.di.PlanetWidgetInjector
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -29,6 +29,8 @@ class PlanetWidget : AppWidgetProvider() {
         super.onEnabled(context)
 
         doAsync { controller.updatePlanetDistances() }
+
+        UpdateDistancesWorker.startWorker(context ?: return)
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -103,8 +105,10 @@ class PlanetWidget : AppWidgetProvider() {
     }
 
     override fun onDisabled(context: Context?) {
-        super.onDisabled(context)
 
+        UpdateDistancesWorker.stopWorker(context ?: return)
+
+        super.onDisabled(context)
     }
 
     override fun onDeleted(context: Context?, appWidgetIds: IntArray?) {

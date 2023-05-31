@@ -27,13 +27,6 @@ class PlanetWidgetApplication : Application(), Configuration.Provider {
         )
 
         updateDistancesWorkerFactory = planetWidgetFeature.getUpdateDistancesWorkerFactory()
-
-        val updateRequest =
-            PeriodicWorkRequestBuilder<UpdateDistancesWorker>(15, TimeUnit.MINUTES)
-                .build()
-
-        WorkManager.getInstance(this)
-            .enqueueUniquePeriodicWork("update", ExistingPeriodicWorkPolicy.KEEP, updateRequest)
     }
 
     override fun getWorkManagerConfiguration(): Configuration =
